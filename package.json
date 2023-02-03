@@ -1,0 +1,28 @@
+{
+	"name": "elysium-smart-contract",
+	"version": "1.0.0",
+	"description": "The smart contract for an nft marketplace",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/davidbong-05/elysium-smart-contract.git"
+	},
+	"keywords": [
+		"NFT",
+		"NFT",
+		"Marketplace"
+	],
+	"author": "davidbong-05",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/davidbong-05/elysium-smart-contract/issues"
+	},
+	"homepage": "https://github.com/davidbong-05/elysium-smart-contract#readme",
+	"devDependencies": {
+		"@nomicfoundation/hardhat-toolbox": "^2.0.1",
+		"hardhat": "^2.12.6"
+	}
+}
