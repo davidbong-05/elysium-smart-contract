@@ -1,14 +1,17 @@
 const hre = require("hardhat");
 
 async function main() {
-	const Lock = await hre.ethers.getContractFactory("Lock");
-	const lock = await Lock.deploy();
+	const Factory = await hre.ethers.getContractFactory("ElysiumNFTFactory");
+	const factory = await Factory.deploy();
+	await factory.deployed();
 
-	await lock.deployed();
+	const Market = await hre.ethers.getContractFactory("ElysiumNFTMarketplace");
+	const platformFee = 10; //wei
+	const market = await Market.deploy(platformFee, factory.address);
+	await market.deployed();
 
-	console.log(
-		`Lock with 1 ETH and unlock timestamp ${unlockTime} deployed to ${lock.address}`
-	);
+	console.log(`Elysium smart contract deployed to ${market.address}`);
+	console.log(`NFT Factory smart contract deployed to ${factory.address}`);
 }
 
 main().catch((error) => {
