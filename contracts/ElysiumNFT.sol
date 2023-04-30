@@ -23,6 +23,8 @@ contract ElysiumNFT is
     uint256 private royalty;
     address payable private royaltyRecipient;
 
+    event NewNFTMinted(uint256 tokenId, address owner, string tokenUri);
+
     constructor(
         string memory _name,
         string memory _symbol,
@@ -37,11 +39,13 @@ contract ElysiumNFT is
         transferOwnership(_owner);
     }
 
-    function safeMint(address to, string memory uri) public onlyOwner {
+    function safeMint(address _to, string memory _uri) public onlyOwner {
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
-        _safeMint(to, tokenId);
-        _setTokenURI(tokenId, uri);
+        _safeMint(_to, tokenId);
+        _setTokenURI(tokenId, _uri);
+
+        emit NewNFTMinted(tokenId, _to, _uri);
     }
 
     // The following functions are overrides required by Solidity.
