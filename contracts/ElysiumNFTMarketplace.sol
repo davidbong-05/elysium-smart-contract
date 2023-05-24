@@ -196,6 +196,10 @@ contract ElysiumNFTMarketplace is Ownable, ReentrancyGuard {
         return platformFee;
     }
 
+    function getFeeRecipient() public view returns (address) {
+        return feeRecipient;
+    }
+
     function calculateRoyalty(
         uint256 _royalty,
         uint256 _price
