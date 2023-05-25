@@ -1,7 +1,7 @@
 const { expect } = require("chai");
 const { loadFixture } = require("@nomicfoundation/hardhat-network-helpers");
 
-describe("NFT Contract", function () {
+describe("NFT Factory Contract", function () {
 	async function deployNFTFactoryFixture() {
 		const [owner, addr1, addr2] = await ethers.getSigners();
 		const Factory = await hre.ethers.getContractFactory("ElysiumNFTFactory");
