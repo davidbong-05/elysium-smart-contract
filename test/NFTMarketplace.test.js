@@ -136,4 +136,65 @@ describe("NFT Marketplace Contract", function () {
 			).to.be.revertedWith("Only original owner can cancel listing");
 		});
 	});
+
+	describe("Buying NFT", function () {
+		it("Should buy listed NFT", async function () {
+			const { market, addr2 } = await loadFixture(deployMarketFixture);
+			const { nft, nftOwner, tokenId } = await loadFixture(mintNFTFixture);
+			const price = 100; //wei
+			await nft.connect(nftOwner).approve(market.address, tokenId);
+			await market.connect(nftOwner).listNft(nft.address, tokenId, price);
+			await addr2.sendTransaction({
+				to: market.address,
+				value: price,
+			});
+			await market.connect(addr2).buyNFT(nft.address, tokenId, price);
+			expect(await nft.balanceOf(addr2)).to.equal(1);
+		});
+		it("Should not buy if NFT not listed", async function () {
+			const { market } = await loadFixture(deployMarketFixture);
+			const newPlatformFee = 100; //wei
+			await market.updatePlatformFee(newPlatformFee);
+			expect(await market.getPlatformFee()).to.equal(newPlatformFee);
+		});
+		it("Should not buy if NFT is sold", async function () {
+			const { market } = await loadFixture(deployMarketFixture);
+			const newPlatformFee = 100; //wei
+			await market.updatePlatformFee(newPlatformFee);
+			expect(await market.getPlatformFee()).to.equal(newPlatformFee);
+		});
+		it("Should not buy if insufficient ether", async function () {
+			const { market } = await loadFixture(deployMarketFixture);
+			const newPlatformFee = 100; //wei
+			await market.updatePlatformFee(newPlatformFee);
+			expect(await market.getPlatformFee()).to.equal(newPlatformFee);
+		});
+	});
+
+	describe("Buying Bulk NFTs", function () {
+		it("Should buy listed NFTs", async function () {
+			const { market } = await loadFixture(deployMarketFixture);
+			const newPlatformFee = 100; //wei
+			await market.updatePlatformFee(newPlatformFee);
+			expect(await market.getPlatformFee()).to.equal(newPlatformFee);
+		});
+		it("Should not buy if NFT not listed", async function () {
+			const { market } = await loadFixture(deployMarketFixture);
+			const newPlatformFee = 100; //wei
+			await market.updatePlatformFee(newPlatformFee);
+			expect(await market.getPlatformFee()).to.equal(newPlatformFee);
+		});
+		it("Should not buy if NFT is sold", async function () {
+			const { market } = await loadFixture(deployMarketFixture);
+			const newPlatformFee = 100; //wei
+			await market.updatePlatformFee(newPlatformFee);
+			expect(await market.getPlatformFee()).to.equal(newPlatformFee);
+		});
+		it("Should not buy if insufficient ether", async function () {
+			const { market } = await loadFixture(deployMarketFixture);
+			const newPlatformFee = 100; //wei
+			await market.updatePlatformFee(newPlatformFee);
+			expect(await market.getPlatformFee()).to.equal(newPlatformFee);
+		});
+	});
 });

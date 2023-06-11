@@ -134,8 +134,7 @@ contract ElysiumNFTMarketplace is Ownable, ReentrancyGuard {
     // @notice Buy listed NFT
     function buyNFT(
         address _nft,
-        uint256 _tokenId,
-        uint256 _price
+        uint256 _tokenId
     ) public payable isListedNFT(_nft, _tokenId) {
         ListNFT storage listedNft = listNfts[_nft][_tokenId];
 
@@ -150,7 +149,7 @@ contract ElysiumNFTMarketplace is Ownable, ReentrancyGuard {
         uint256 royalty = nft.getRoyalty();
 
         if (royalty > 0) {
-            uint256 royaltyTotal = calculateRoyalty(royalty, _price);
+            uint256 royaltyTotal = calculateRoyalty(royalty, listedNft.price);
 
             // Transfer royalty fee to collection owner
             payable(royaltyRecipient).transfer(royaltyTotal);
@@ -174,22 +173,72 @@ contract ElysiumNFTMarketplace is Ownable, ReentrancyGuard {
         emit BoughtNFT(
             listedNft.nft,
             listedNft.tokenId,
-            _price,
+            listedNft.price,
             listedNft.seller,
             msg.sender
         );
     }
 
-    function buyBulkNFTs(ListNFT[] memory nfts) external payable {
+    function buyBulkNFTs(
+        address[] memory _nfts,
+        uint256[] memory _tokenIds
+    ) external payable {
         uint256 totalPrice = 0;
-        for (uint256 i = 0; i < nfts.length; i++) {
-            require(!nfts[i].sold, "NFT already sold");
-            totalPrice += nfts[i].price;
+        ListNFT[] memory listedNfts = new ListNFT[](_nfts.length);
+        for (uint256 i = 0; i < _nfts.length; i++) {
+            listedNfts[i] = listNfts[_nfts[i]][_tokenIds[i]];
+            totalPrice += listedNfts[i].price;
         }
         require(msg.value >= totalPrice, "Insufficient ether provided");
-        for (uint256 i = 0; i < nfts.length; i++) {
-            buyNFT(nfts[i].nft, nfts[i].tokenId, nfts[i].price);
+        uint256 totalPayment = msg.value;
+        uint256 payment = 0;
+
+        for (uint256 i = 0; i < _nfts.length; i++) {
+            require(listedNfts[i].seller != address(0), "not listed");
+            require(!listedNfts[i].sold, "nft already sold");
+            require(msg.value >= listedNfts[i].price, "Insufficient payment");
+            payment = listedNfts[i].price;
+            listedNfts[i].sold = true;
+
+            elysiumNFTInterface nft = elysiumNFTInterface(listedNfts[i].nft);
+            address royaltyRecipient = nft.getRoyaltyRecipient();
+            uint256 royalty = nft.getRoyalty();
+
+            if (royalty > 0) {
+                uint256 royaltyTotal = calculateRoyalty(
+                    royalty,
+                    listedNfts[i].price
+                );
+
+                // Transfer royalty fee to collection owner
+                payable(royaltyRecipient).transfer(royaltyTotal);
+                payment -= royaltyTotal;
+            }
+
+            // Transfer platform fee
+            payable(feeRecipient).transfer(platformFee);
+            payment -= platformFee;
+
+            // Transfer to nft owner
+            payable(listedNfts[i].seller).transfer(payment);
+            totalPayment -= listedNfts[i].price;
+
+            // Transfer NFT to buyer
+            IERC721(listedNfts[i].nft).safeTransferFrom(
+                address(this),
+                msg.sender,
+                listedNfts[i].tokenId
+            );
+
+            emit BoughtNFT(
+                listedNfts[i].nft,
+                listedNfts[i].tokenId,
+                listedNfts[i].price,
+                listedNfts[i].seller,
+                msg.sender
+            );
         }
+        payable(msg.sender).transfer(totalPayment);
     }
 
     function getPlatformFee() public view returns (uint256) {
