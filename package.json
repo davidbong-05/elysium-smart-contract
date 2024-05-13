@@ -23,7 +23,7 @@
 	"homepage": "https://github.com/davidbong-05/elysium-smart-contract#readme",
 	"devDependencies": {
 		"@nomicfoundation/hardhat-toolbox": "^2.0.1",
-		"hardhat": "^2.12.6"
+		"hardhat": "^2.22.3"
 	},
 	"dependencies": {
 		"@openzeppelin/contracts": "^4.8.3",
