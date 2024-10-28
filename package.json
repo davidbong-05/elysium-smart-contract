@@ -24,7 +24,11 @@
   "homepage": "https://github.com/davidbong-05/elysium-smart-contract#readme",
   "description": "",
   "devDependencies": {
-    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
-    "hardhat": "^2.22.15"
+    "@nomicfoundation/hardhat-toolbox": "^2.0.2",
+    "hardhat": "^2.3.3"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.1.0",
+    "ws": "^8.18.0"
   }
 }
