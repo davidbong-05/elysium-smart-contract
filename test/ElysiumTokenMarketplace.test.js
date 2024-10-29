@@ -165,49 +165,58 @@ describe("Elysium Token Marketplace Contract", function () {
       expect(await nft.balanceOf(addr2)).to.equal(1);
     });
     it("Should not buy if Token not listed", async function () {
-      const { market } = await loadFixture(deployMarketFixture);
-      const newPlatformFee = 100; //wei
-      await market.updatePlatformFee(newPlatformFee);
-      expect(await market.getPlatformFee()).to.equal(newPlatformFee);
+      const { market, addr2, nft, nftOwner, tokenId } = await loadFixture(
+        mintTokenFixture
+      );
+      const price = 100; //wei
+      await nft.connect(nftOwner).approve(market.target, tokenId);
+
+      await expect(
+        market.connect(addr2).buyToken(nft.target, tokenId, { value: price })
+      ).to.be.revertedWith("not listed");
     });
     it("Should not buy if Token is sold", async function () {
-      const { market } = await loadFixture(deployMarketFixture);
-      const newPlatformFee = 100; //wei
-      await market.updatePlatformFee(newPlatformFee);
-      expect(await market.getPlatformFee()).to.equal(newPlatformFee);
+      const { market, addr2, nft, nftOwner, tokenId } = await loadFixture(
+        mintTokenFixture
+      );
+      const price = 100; //wei
+      await nft.connect(nftOwner).approve(market.target, tokenId);
+      await market.connect(nftOwner).listToken(nft.target, tokenId, price);
+      await market
+        .connect(addr2)
+        .buyToken(nft.target, tokenId, { value: price });
+
+      await expect(
+        market.connect(nftOwner).buyToken(nft.target, tokenId, { value: price })
+      ).to.be.revertedWith("not listed");
     });
     it("Should not buy if insufficient ether", async function () {
-      const { market } = await loadFixture(deployMarketFixture);
-      const newPlatformFee = 100; //wei
-      await market.updatePlatformFee(newPlatformFee);
-      expect(await market.getPlatformFee()).to.equal(newPlatformFee);
+      const { market, addr2, nft, nftOwner, tokenId } = await loadFixture(
+        mintTokenFixture
+      );
+      const price = 100; //wei
+      await nft.connect(nftOwner).approve(market.target, tokenId);
+      await market.connect(nftOwner).listToken(nft.target, tokenId, price);
+      const payment = 99; //wei
+
+      await expect(
+        market.connect(addr2).buyToken(nft.target, tokenId, { value: payment })
+      ).to.be.revertedWith("insufficient payment");
     });
   });
 
   describe("Buying Bulk Tokens", function () {
     it("Should buy listed Tokens", async function () {
-      const { market } = await loadFixture(deployMarketFixture);
-      const newPlatformFee = 100; //wei
-      await market.updatePlatformFee(newPlatformFee);
-      expect(await market.getPlatformFee()).to.equal(newPlatformFee);
+      //TODO
     });
     it("Should not buy if Token not listed", async function () {
-      const { market } = await loadFixture(deployMarketFixture);
-      const newPlatformFee = 100; //wei
-      await market.updatePlatformFee(newPlatformFee);
-      expect(await market.getPlatformFee()).to.equal(newPlatformFee);
+      //TODO
     });
     it("Should not buy if Token is sold", async function () {
-      const { market } = await loadFixture(deployMarketFixture);
-      const newPlatformFee = 100; //wei
-      await market.updatePlatformFee(newPlatformFee);
-      expect(await market.getPlatformFee()).to.equal(newPlatformFee);
+      //TODO
     });
     it("Should not buy if insufficient ether", async function () {
-      const { market } = await loadFixture(deployMarketFixture);
-      const newPlatformFee = 100; //wei
-      await market.updatePlatformFee(newPlatformFee);
-      expect(await market.getPlatformFee()).to.equal(newPlatformFee);
+      //TODO
     });
   });
 });
