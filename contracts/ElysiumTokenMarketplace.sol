@@ -112,7 +112,7 @@ contract ElysiumTokenMarketplace is Ownable{
     }
 
     // @notice Cancel listed Token
-    function cancelListToken(
+    function unlistToken(
         address collectionAddress,
         uint256 tokenId
     ) external isListedToken(collectionAddress, tokenId) {
@@ -146,7 +146,7 @@ contract ElysiumTokenMarketplace is Ownable{
 
         // Handle royalty payment
         if (royalty > 0) {
-            uint256 royaltyTotal = calculateRoyalty(royalty, listedToken.price);
+            uint256 royaltyTotal = getCalculatedRoyalty(royalty, listedToken.price);
 
             // Transfer royalty fee to collection owner
             payable(royaltyRecipient).transfer(royaltyTotal);
@@ -154,8 +154,11 @@ contract ElysiumTokenMarketplace is Ownable{
         }
 
         // Transfer platform fee
-        payable(_feeRecipient).transfer(_platformFee);
-        totalPayment -= _platformFee;
+        if(_platformFee>0)
+        {
+            payable(_feeRecipient).transfer(_platformFee);
+            totalPayment -= _platformFee;
+        }
 
         // Transfer remaining payment to Token owner
         payable(listedToken.seller).transfer(totalPayment);
@@ -195,7 +198,7 @@ contract ElysiumTokenMarketplace is Ownable{
 
             // Royalty processing
             elysiumTokenInterface token = elysiumTokenInterface(listedToken.token);
-            uint256 royaltyTotal = calculateRoyalty(token.getRoyalty(), listedToken.price);
+            uint256 royaltyTotal = getCalculatedRoyalty(token.getRoyalty(), listedToken.price);
             
             if (royaltyTotal > 0) {
                 payable(token.getRoyaltyRecipient()).transfer(royaltyTotal);
@@ -203,8 +206,11 @@ contract ElysiumTokenMarketplace is Ownable{
             }
 
             // Platform fee and seller payment
-            _feeRecipient.transfer(_platformFee);
-            payment -= _platformFee;
+            if(_platformFee>0)
+            {
+                _feeRecipient.transfer(_platformFee);
+                payment -= _platformFee;
+            }
             listedToken.seller.transfer(payment);
 
             // Transfer token to buyer
@@ -237,7 +243,7 @@ contract ElysiumTokenMarketplace is Ownable{
         return _feeRecipient;
     }
 
-    function calculateRoyalty(
+    function getCalculatedRoyalty(
         uint256 _royalty,
         uint256 price
     ) public pure returns (uint256) {
@@ -256,7 +262,7 @@ contract ElysiumTokenMarketplace is Ownable{
         _platformFee = platformFee;
     }
 
-    function changeFeeRecipient(address feeRecipient) external onlyOwner {
+    function updateFeeRecipient(address feeRecipient) external onlyOwner {
         require(feeRecipient != address(0), "can't be 0 address");
         _feeRecipient = payable(feeRecipient);
     }

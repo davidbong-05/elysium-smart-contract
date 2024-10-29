@@ -83,7 +83,7 @@ describe("Elysium Token Marketplace Contract", function () {
 
     it("Should change platform fee recipient", async function () {
       const { market, addr1 } = await loadFixture(deployMarketFixture);
-      await market.changeFeeRecipient(addr1.address);
+      await market.updateFeeRecipient(addr1.address);
       expect(await market.getFeeRecipient()).to.equal(addr1.address);
     });
   });
@@ -94,7 +94,9 @@ describe("Elysium Token Marketplace Contract", function () {
         mintTokenFixture
       );
       const price = 100; //wei
-      await nft.connect(nftOwner).approve(market.target, tokenId);
+      const gasprice = await nft
+        .connect(nftOwner)
+        .approve(market.target, tokenId);
       await market.connect(nftOwner).listToken(nft.target, tokenId, price);
       expect(await nft.balanceOf(market.target)).to.equal(1);
     });
@@ -125,7 +127,7 @@ describe("Elysium Token Marketplace Contract", function () {
       const price = 100; //wei
       await nft.connect(nftOwner).approve(market.target, tokenId);
       await market.connect(nftOwner).listToken(nft.target, tokenId, price);
-      await market.connect(nftOwner).cancelListToken(nft.target, tokenId);
+      await market.connect(nftOwner).unlistToken(nft.target, tokenId);
       expect(await nft.balanceOf(market.target)).to.equal(0);
     });
     it("Should not cancel list Token for sale if Token not listed", async function () {
@@ -134,7 +136,7 @@ describe("Elysium Token Marketplace Contract", function () {
       );
       await nft.connect(nftOwner).approve(market.target, tokenId);
       await expect(
-        market.connect(nftOwner).cancelListToken(nft.target, tokenId)
+        market.connect(nftOwner).unlistToken(nft.target, tokenId)
       ).to.be.revertedWith("not listed");
     });
     it("Should not cancel list Token for sale if Token not seller", async function () {
@@ -145,7 +147,7 @@ describe("Elysium Token Marketplace Contract", function () {
       await nft.connect(nftOwner).approve(market.target, tokenId);
       await market.connect(nftOwner).listToken(nft.target, tokenId, price);
       await expect(
-        market.connect(addr2).cancelListToken(nft.target, tokenId)
+        market.connect(addr2).unlistToken(nft.target, tokenId)
       ).to.be.revertedWith("not token owner");
     });
   });
