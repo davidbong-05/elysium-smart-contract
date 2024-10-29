@@ -7,7 +7,7 @@ import "./ElysiumToken.sol";
 /* Elysium Token Factory
     Create new elysium token collection
 */
-/// @custom:security-contact davidbong@gmail.com
+/// @custom:security-contact davidbong05@gmail.com
 contract ElysiumTokenFactory{
     // owner address => collection list
     address[] private _elysiumUsers;
