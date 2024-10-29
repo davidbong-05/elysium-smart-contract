@@ -158,11 +158,10 @@ describe("Elysium Token Marketplace Contract", function () {
       const price = 100; //wei
       await nft.connect(nftOwner).approve(market.target, tokenId);
       await market.connect(nftOwner).listToken(nft.target, tokenId, price);
-      await addr2.sendTransaction({
-        to: market.target,
-        value: price,
-      });
-      await market.connect(addr2).buyToken(nft.target, tokenId, price);
+      await market
+        .connect(addr2)
+        .buyToken(nft.target, tokenId, { value: price });
+
       expect(await nft.balanceOf(addr2)).to.equal(1);
     });
     it("Should not buy if Token not listed", async function () {
