@@ -106,7 +106,7 @@ contract ElysiumTokenFactory{
         return _elysiumUserCollections[userAddress];
     }
 
-    function isElysiumCollection(address token) external view returns (bool) {
-        return _elysiumCollection[token];
+    function isElysiumCollection(address collectionAddress) external view returns (bool) {
+        return _elysiumCollection[collectionAddress];
     }
 }
