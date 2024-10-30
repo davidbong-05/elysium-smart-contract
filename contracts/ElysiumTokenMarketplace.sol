@@ -8,9 +8,10 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 interface elysiumTokenFactoryInterface {
     function createCollection(
-        string memory _name,
-        string memory _symbol,
-        uint256 _royalty
+        string memory name,
+        string memory symbol,
+        uint256 royalty,
+        address payable royaltyRecipient
     ) external;
 }
 
